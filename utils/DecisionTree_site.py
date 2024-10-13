@@ -6,6 +6,8 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 import numpy as np
+from sklearn.impute import SimpleImputer
+
 
 class DecisionTree:
     '''
@@ -34,10 +36,13 @@ class DecisionTree:
         
         # Define the column transformer for both numerical and categorical features
         preprocessor = ColumnTransformer(
-            transformers=[
-                ('num', StandardScaler(), self.num_features),
-                ('cat', OrdinalEncoder(), self.cat_features)
-            ]
+        transformers=[
+            ('num', Pipeline(steps=[
+                ('imputer', SimpleImputer(strategy='constant', fill_value=0)),  # Replace missing values with 0
+                ('scaler', StandardScaler())  # Standardize numerical features
+            ]), self.num_features),
+            ('cat', OrdinalEncoder(), self.cat_features)  # Encode categorical features
+        ]
         )
 
         # Create the pipeline
