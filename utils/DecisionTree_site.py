@@ -7,13 +7,15 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 import numpy as np
 from sklearn.impute import SimpleImputer
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 class DecisionTree:
     '''
     A site-specific decision tree model using sklearn's Pipeline
     '''
     def __init__(self, site, cat_features, num_features, target, df) -> None:
+        super().__init__()
         self.site = site
         self.cat_features = cat_features
         self.num_features = num_features
@@ -48,7 +50,7 @@ class DecisionTree:
         # Create the pipeline
         pipeline = Pipeline(steps=[
             ('preprocessor', preprocessor),
-            ('regressor', DecisionTreeRegressor())
+            ('regressor', DecisionTreeRegressor(max_depth=5))  # Set the depth
         ])
         
         # Split data into train and test sets
@@ -63,6 +65,26 @@ class DecisionTree:
 
         # Evaluate model performance
         self.evaluate_model(y_train, y_pred_train, y_test, y_pred_test)
+        
+        # Access and display feature importances
+        feature_importances_ = pipeline.named_steps['regressor'].feature_importances_
+
+        feature_names = pipeline.named_steps['preprocessor'].get_feature_names_out()
+
+        # Combine feature names with their importances
+        feature_importance_dict = dict(zip(feature_names, feature_importances_))
+
+        # Sort by importance
+        self.sorted_feature_importances = sorted(feature_importance_dict.items(), key=lambda x: x[1], reverse=True)
+
+        plt.figure(figsize=(12, 6))
+        sns.barplot(x=[importance for name, importance in self.sorted_feature_importances],
+                    y=[name for name, importance in self.sorted_feature_importances],
+                    palette='viridis')
+        plt.title('Feature Importances')
+        plt.xlabel('Importance')
+        plt.ylabel('Feature')
+        plt.show()
 
     def evaluate_model(self, y_train, y_pred_train, y_test, y_pred_test):
         '''Evaluates the model and prints the results.'''
@@ -90,3 +112,5 @@ class DecisionTree:
         mean_flow = np.mean(self.data[self.target])
         print(f'Mean Absolute Percentage Error (MAPE) Test: {100 * mae_test / mean_flow:.1f}%')
         print(f'Mean Absolute Percentage Error (MAPE) Train: {100 * mae_train / mean_flow:.1f}%')
+
+
