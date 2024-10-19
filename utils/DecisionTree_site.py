@@ -50,7 +50,7 @@ class DecisionTree:
         # Create the pipeline
         pipeline = Pipeline(steps=[
             ('preprocessor', preprocessor),
-            ('regressor', DecisionTreeRegressor(max_depth=5))  # Set the depth
+            ('regressor', DecisionTreeRegressor())  # Set the depth
         ])
         
         # Split data into train and test sets
