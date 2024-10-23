@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OrdinalEncoder, StandardScaler
+from sklearn.preprocessing import OrdinalEncoder, StandardScaler, OneHotEncoder
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.compose import ColumnTransformer
@@ -43,7 +43,7 @@ class DecisionTree:
                 ('imputer', SimpleImputer(strategy='constant', fill_value=0)),  # Replace missing values with 0
                 ('scaler', StandardScaler())  # Standardize numerical features
             ]), self.num_features),
-            ('cat', OrdinalEncoder(), self.cat_features)  # Encode categorical features
+            ('cat', OneHotEncoder(), self.cat_features)  # Encode categorical features
         ]
         )
 
